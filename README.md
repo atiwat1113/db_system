@@ -10,4 +10,4 @@ DB_NAME=your database name
 
 เปิด cmd/terminal -> พิมพ์ npm i
 
-ีรันโดยพิมพ์ npm start
+รันโดยพิมพ์ npm start
