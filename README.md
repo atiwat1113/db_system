@@ -1,8 +1,12 @@
-clone repo แล้วสร้างไฟล์ .env ใส่ข้อมูลของ mysql ตามนี้
+clone repo แล้วสร้างไฟล์ .env ใส่ข้อมูลของ mysql 
+
 DB_HOST=localhost
-DB_USER=<your username>
-DB_PASS=<your password>
-DB_NAME=<your database name>
+
+DB_USER=your username
+
+DB_PASS=your password
+
+DB_NAME=your database name
 
 เปิด cmd/terminal -> พิมพ์ npm i
 
