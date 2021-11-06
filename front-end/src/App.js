@@ -1,27 +1,80 @@
-import { Button, TextField, Card } from "@material-ui/core";
-// import logo from './logo.svg';
+import {
+  TextField,
+  makeStyles,
+  Button,
+  Paper,
+  Grid,
+  Divider,
+} from "@material-ui/core";
+
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+import { useState } from "react";
+
+const useStyles = makeStyles({
+  field: {
+    marginTop: 10,
+    marginBottom: 15,
+    display: "block",
+    
+  },
+});
+
 
 function App() {
+  const classes = useStyles();
+  const [cardNum, setCardNum] = useState("");
+  const [holderName, setHolderName] = useState("");
+  const [expireDate, setExpireDate] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (cardNum && holderName && expireDate) {
+      console.log(cardNum, holderName, expireDate);
+    }
+  };
+
   return (
-    <div className="App">
-      <Button color="primary" variant="contained">
-        Click Me
-      </Button>
-      Learn React
-      <Card>
-        <TextField
-          id="outlined-basic"
-          label="Outlined"
-          variant="outlined"
-        ></TextField>
-      </Card>
-      <div class="d-flex flex-row bd-highlight mb-3">
-        <div class="p-2 bd-highlight">Flex item 1</div>
-        <div class="p-2 bd-highlight">Flex item 2</div>
-        <div class="p-2 bd-highlight">Flex item 3</div>
-      </div>
-    </div>
+    <Grid container spacing={2}>
+      <Grid item xs={4}>
+        <Paper
+          style={{
+            margin: 16,
+            padding: 16
+          }}
+        >
+          <h3>INSERT CREDIT CARD</h3>
+          <Divider style={{ background: 'black', marginTop: 16}} variant="fullWidth" />
+          <form noValidate autoComplete="off" onSubmit={handleSubmit}>
+            <TextField
+              key="Confirmation Code"
+              onChange={(e) => setCardNum(e.target.value)}
+              className={classes.field}
+              label="Credit Card Number"
+              required
+            />
+            <TextField
+              onChange={(e) => setHolderName(e.target.value)}
+              className={classes.field}
+              label="Card Holder Name"
+              required 
+            />
+            <TextField
+              onChange={(e) => setExpireDate(e.target.value)}
+              className={classes.field}
+              label="Expire Date"
+              required
+            />
+
+              <Button type="submit" variant="outlined" color="primary">
+                Submit
+              </Button>
+
+          </form>
+        </Paper>
+      </Grid>
+    </Grid>
   );
 }
 
