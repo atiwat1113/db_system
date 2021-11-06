@@ -1,23 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import { Button, TextField, Card } from "@material-ui/core";
+// import logo from './logo.svg';
+import "./App.css";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Button color="primary" variant="contained">
+        Click Me
+      </Button>
+      Learn React
+      <Card>
+        <TextField
+          id="outlined-basic"
+          label="Outlined"
+          variant="outlined"
+        ></TextField>
+      </Card>
+      <div class="d-flex flex-row bd-highlight mb-3">
+        <div class="p-2 bd-highlight">Flex item 1</div>
+        <div class="p-2 bd-highlight">Flex item 2</div>
+        <div class="p-2 bd-highlight">Flex item 3</div>
+      </div>
     </div>
   );
 }
