@@ -1,5 +1,6 @@
 const express = require('express');
 const RiderRouter = require('./routes/rider');
+const CustomerRouter = require('./routes/customer');
 const cors = require('cors');
 require('dotenv').config()
 const mongoose = require('mongoose');
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/riders', RiderRouter);
+app.use('/customers', CustomerRouter);
 
 app.listen(8080, () => {
     console.log('Listening to port 8080');
