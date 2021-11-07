@@ -16,8 +16,7 @@ router.get('/info', async (req, res) => {
         from user u 
         natural join rider r 
         natural join station s
-        where s.name = ${stationName};
-
+        where s.name = '${stationName}';
         `);
         res.status(200).send(result[0]);
     }
