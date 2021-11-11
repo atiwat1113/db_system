@@ -14,6 +14,7 @@ import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/App.css";
 import Navbar from "../components/Navbar";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   // Handle all TextField style.
@@ -45,11 +46,32 @@ function MainApp() {
   };
 
   //TODO: INSERT credit card.
-  const insertCreditCard = (e) => {
+  async function insertCreditCard(e) {
     e.preventDefault();
-    console.log("HI");
-  };
 
+    console.log(axios.defaults.withCredentials)
+
+    if (cardNum && holderName && expireDate) {
+      const input_body = JSON.stringify({
+        card_number: cardNum,
+        card_holder_name: holderName,
+        expire_date: expireDate,
+      });
+      try {
+        const return_status = await axios
+          .post("/customers/cards", input_body, {
+            headers: {
+              // Overwrite Axios's automatically set Content-Type
+              "Content-Type": "application/json",
+            },
+          })
+          .then((res) => res.status);
+        console.log(return_status);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
 
   return (
     //TODO: Group Components together + Create Style class.
