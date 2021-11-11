@@ -1,17 +1,12 @@
 // Import things.
 import {
-  TextField,
   makeStyles,
-  Button,
-  Paper,
-  Divider,
   Box,
   AppBar,
   Toolbar,
   Typography,
 } from "@material-ui/core";
-import { Alert, Link } from "@mui/material";
-import { useState } from "react";
+import { Link } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/App.css";
 

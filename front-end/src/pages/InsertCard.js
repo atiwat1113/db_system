@@ -6,13 +6,10 @@ import {
   Paper,
   Divider,
   Box,
-  AppBar,
-  Toolbar,
   Typography,
   createTheme,
   ThemeProvider,
 } from "@material-ui/core";
-import { Alert } from "@mui/material";
 import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/App.css";
@@ -41,14 +38,6 @@ function MainApp() {
   const [cardNum, setCardNum] = useState("");
   const [holderName, setHolderName] = useState("");
   const [expireDate, setExpireDate] = useState("");
-  const [locationID, setLocationID] = useState("");
-  const [newName, setNewName] = useState("");
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [addressName, setAddressName] = useState("");
-
-  // useState with an actual state.
-  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
 
   //Test Function
   const console_check = () => {

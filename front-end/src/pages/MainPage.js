@@ -1,17 +1,9 @@
 // Import things.
 import {
-  TextField,
   makeStyles,
-  Button,
-  Paper,
-  Divider,
   Box,
-  AppBar,
-  Toolbar,
   Typography,
 } from "@material-ui/core";
-import { Alert } from "@mui/material";
-import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/App.css";
 import Navbar from "../components/Navbar";
