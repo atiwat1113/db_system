@@ -17,29 +17,34 @@ const Customer = new Schema({
     phone_num: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        minlength: 10,
+        maxlength: 10,
+        match: /0[0-9]*/  // 0 followed by any 9 digits
     },
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        match: /^\w+@[a-zA-Z_]+?(?:.[a-zA-Z])+$/ // anystr@anystr(.anystr)*
     },
     username: { 
         type: String,
         required: true,
         unique: true
     },
-    password: {
+    password: { // stores hashed password
         type: String,
         required: true
     },
     default_payment: {
         type: String,
-        enum: ['cash', 'card', 'bank'] // may be changed
+        required: true,
+        enum: ['cash', 'bank_transfer', 'credit_card'] // may be changed
     },
     saved_address: [{
         name: String,
-        location_id: String//ref something
+        location_id: String
     }],
     card: [{
         card_num: String,
@@ -47,29 +52,3 @@ const Customer = new Schema({
         cvv: String
     }]
 }, {timestamps: true})
-/**
- * User_id
- * first_name
- * last_name
- * phone_num
- * email
- * username
- * password
- * default_payment
- * 
- * Card ??
- * 
- * Saved Addr
- *  - name
- *  - Location
- * 
- * Location
- * Location_id
- * Latitude
- * Longitude
- * Sub-district
- * district
- * province
- * postal_code
-
- */
