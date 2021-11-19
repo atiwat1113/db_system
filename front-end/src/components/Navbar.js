@@ -48,8 +48,8 @@ function Navbar() {
           sx={{ display: "flex", alignItems: "flex-start", paddingLeft: 20 }}
         >
           <Typography>
-            <NavLink label="INSERT Card" link_to="/insert_card" />
-            <NavLink label="UPDATE Address" link_to="/update_add" />
+            <NavLink label="Book a Ride (INSERT)" link_to="/book_a_ride" />
+            <NavLink label="UPDATE Station" link_to="/update_station" />
             <NavLink label="QUERY Riders" link_to="/query_riders" />
             <NavLink label="DELETE Account" link_to="/del_acc" />
             <NavLink label="INSERT Address (NOSQL)" link_to="/insert_add" />

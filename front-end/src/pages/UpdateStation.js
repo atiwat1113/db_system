@@ -15,6 +15,7 @@ import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/App.css";
 import Navbar from "../components/Navbar";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   // Handle all TextField style.
@@ -32,17 +33,35 @@ const theme = createTheme({
   },
 });
 
-//TODO: Implement HTTP Method
-const updateSavedAddress = (e) => {
-  e.preventDefault();
-};
-
-function UpdateAddress() {
+function UpdateStation() {
   const classes = useStyles();
 
   // useState with variables.
-  const [locationID, setLocationID] = useState("");
-  const [newName, setNewName] = useState("");
+  const [stationID, setStationID] = useState("");
+
+  //TODO: Implement HTTP Method
+  async function updateStationID(e) {
+    e.preventDefault();
+
+    if (stationID) {
+      const input_body = JSON.stringify({
+        station_ID: stationID,
+      });
+      try {
+        const return_status = await axios
+          .patch("/riders/station", input_body, {
+            headers: {
+              // Overwrite Axios's automatically set Content-Type
+              "Content-Type": "application/json",
+            },
+          })
+          .then((res) => res.status);
+        console.log(return_status);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -58,23 +77,16 @@ function UpdateAddress() {
               padding: 32,
             }}
           >
-            <Typography variant="h5">UPDATE SAVED ADDRESS</Typography>
+            <Typography variant="h5">UPDATE STATION</Typography>
             <Divider
               style={{ background: "black", marginTop: 16 }}
               variant="fullWidth"
             />
-            <form noValidate autoComplete="off" onSubmit={updateSavedAddress}>
+            <form noValidate autoComplete="off" onSubmit={updateStationID}>
               <TextField
-                onChange={(e) => setLocationID(e.target.value)}
+                onChange={(e) => setStationID(e.target.value)}
                 className={classes.field}
-                label="Location ID"
-                required
-                fullWidth
-              />
-              <TextField
-                onChange={(e) => setNewName(e.target.value)}
-                className={classes.field}
-                label="New name to update"
+                label="Station ID"
                 required
                 fullWidth
               />
@@ -96,4 +108,4 @@ function UpdateAddress() {
   );
 }
 
-export default UpdateAddress;
+export default UpdateStation;

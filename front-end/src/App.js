@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import InsertCard from "./pages/InsertCard";
+import BookARide from "./pages/BookARide";
 import InsertAddress from "./pages/InsertAddress";
 import MainPage from "./pages/MainPage"
 import DeleteAccount from "./pages/DeleteAccount"
 import { createTheme, makeStyles, ThemeProvider } from "@material-ui/core";
 import './index.css';
-import UpdateAddress from "./pages/UpdateAddress";
+import UpdateStation from "./pages/UpdateStation";
 import QueryRiders from "./pages/QueryRiders";
 
 const theme = createTheme({
@@ -25,9 +25,9 @@ function App() {
         <Router>
             <Routes>
             <Route exact path="/" element={<MainPage/>}/>
-            <Route exact path="/insert_card" element={<InsertCard/>}/>
+            <Route exact path="/book_a_ride" element={<BookARide/>}/>
             <Route exact path="/insert_add" element={<InsertAddress/>}/>
-            <Route exact path="/update_add" element={<UpdateAddress/>}/>
+            <Route exact path="/update_station" element={<UpdateStation/>}/>
             <Route exact path="/del_acc" element={<DeleteAccount/>}/>
             <Route exact path="/query_riders" element={<QueryRiders/>}/>
             </Routes>
