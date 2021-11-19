@@ -227,7 +227,7 @@ CREATE TABLE `rider` (
 
 LOCK TABLES `rider` WRITE;
 /*!40000 ALTER TABLE `rider` DISABLE KEYS */;
-INSERT INTO `rider` VALUES ('UID00002','ST000001','ab11111111111111','1234567891011',1,NULL,0),('UID00003','ST000001','ab11111111111112','1234567891012',0,1,100),('UID00005','ST000003','ab11111111111113','1234567891013',1,5,500);
+INSERT INTO `rider` VALUES ('UID00002','ST000002','ab11111111111111','1234567891011',1,NULL,0),('UID00003','ST000001','ab11111111111112','1234567891012',0,1,100),('UID00005','ST000003','ab11111111111113','1234567891013',1,5,500);
 /*!40000 ALTER TABLE `rider` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -393,7 +393,7 @@ CREATE TABLE `station` (
 
 LOCK TABLES `station` WRITE;
 /*!40000 ALTER TABLE `station` DISABLE KEYS */;
-INSERT INTO `station` VALUES ('ST000001','LC000001','MN000001','Station1',2),('ST000002','LC000002','MN000001','Station2',0),('ST000003','LC000003','MN000002','Station3',1),('ST000004','LC000004','MN000003','Station4',0),('ST000005','LC000005','MN000003','Station5',0);
+INSERT INTO `station` VALUES ('ST000001','LC000001','MN000001','Station1',1),('ST000002','LC000002','MN000001','Station2',1),('ST000003','LC000003','MN000002','Station3',1),('ST000004','LC000004','MN000003','Station4',0),('ST000005','LC000005','MN000003','Station5',0);
 /*!40000 ALTER TABLE `station` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -600,6 +600,180 @@ LOCK TABLES `vehicle` WRITE;
 INSERT INTO `vehicle` VALUES ('123456780abcdefg','ABC3','red'),('123456784abcdefg','ABC2','red'),('123456789abcdefg','ABC','red');
 /*!40000 ALTER TABLE `vehicle` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping routines for database 'winwin'
+--
+/*!50003 DROP FUNCTION IF EXISTS `calcPrice` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `calcPrice`(dist float) RETURNS int
+    DETERMINISTIC
+BEGIN
+	DECLARE price INT;
+	DECLARE remDist float;
+	IF dist > 5 THEN
+	BEGIN
+		set remDist = dist - 5;
+		IF MOD(remDist,1) < 0.5 THEN
+			set remDist = remDist - MOD(remDist,1);
+		ELSE
+			set remDist = remDist - MOD(remDist,1) + 1;
+		END IF;
+		set price = (48 + remDist*12);
+	END;
+	ELSEIF (dist <= 5 AND dist > 2.5) THEN
+	BEGIN
+		set remDist = dist - 2.5;
+		IF MOD(remDist,1) < 0.5 THEN
+			set remDist = remDist - MOD(remDist,1);
+		ELSE
+			set remDist = remDist - MOD(remDist,1) + 1;
+		END IF;
+		set price = (30 + remDist*6);
+	END;
+	ELSEIF (dist <= 2.5 AND dist > 0) THEN
+		set price = 30;
+	END IF;
+	RETURN (price);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `calcRideT` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `calcRideT`(startT datetime, stopT datetime) RETURNS time
+    DETERMINISTIC
+BEGIN
+	DECLARE totalT INT;
+	set totalT = abs(timediff(stopT, startT));
+	RETURN (totalT);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `addBooking` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addBooking`(
+	IN ride_ID char(8), 
+    IN customer_ID char(8), 
+    IN rider_ID char(8), 
+	IN start_latitude float, 
+    IN start_longitude float, 
+    IN stop_latitude float, 
+    IN stop_longitude float, 
+    IN distance float, 
+    IN start_time datetime,
+	IN transaction_ID char(8), 
+    IN payment_method enum('cash','bank_transfer','credit_card')
+)
+BEGIN
+	-- error handler
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN
+		ROLLBACK;
+		Resignal;
+	END;
+
+	SET autocommit = 0;
+	START TRANSACTION;
+	INSERT INTO ride(ride_ID,customer_ID,rider_ID,status,start_latitude,start_longitude,stop_latitude,stop_longitude,distance,start_time) VALUES
+    (ride_ID,customer_ID,rider_ID,'matching',start_latitude,start_longitude,stop_latitude,stop_longitude,distance,start_time);
+    
+    INSERT INTO transactionrecord(transaction_ID,type,status,amount,payment_method) VALUES
+    (transaction_ID,'ride','pending',calcPrice(distance),payment_method);
+    
+    INSERT INTO ridetransaction VALUES
+    (transaction_ID,ride_ID);
+    COMMIT;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `GetRiderFromStation` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetRiderFromStation`(IN stationName varchar(50))
+BEGIN 
+	SELECT u.first_name, u.last_name, u.phone_num, R.ref_no, R.citizen_ID, R.is_available, R.rating 
+	FROM  rider R natural join station S natural join user U
+	WHERE S.name = stationName;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `UpdateRiderStation` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateRiderStation`(
+ 	IN i_user_ID CHAR(8),
+ 	IN i_station_ID CHAR(8)
+ )
+BEGIN
+	DECLARE exit handler for sqlexception
+	Begin
+		Rollback;
+		Resignal;
+	End;
+
+	start transaction;
+
+	update Rider 
+    set station_ID=i_station_ID 
+    where user_ID = i_user_ID;
+
+	commit;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -610,4 +784,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-11-19 16:34:09
+-- Dump completed on 2021-11-20  0:02:37

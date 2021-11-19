@@ -18,7 +18,7 @@
 
 create table if not exists User(
 	user_ID char(8) primary key,
-	username varchar(50) not null,
+	username varchar(50) not null unique,
 	password text not null,
 	email varchar(100) not null unique,
 	first_name varchar(50) not null,
