@@ -9,16 +9,16 @@ insert into location values
 ('LC000008');
 
 insert into manager values
-('MN000001','First1','Last1','Area1','10'),
-('MN000002','First2','Last2','Area2','20'),
-('MN000003','First3','Last3','Area3','30');
+('MN000001','First1','Last1','Area1','2'),
+('MN000002','First2','Last2','Area2','1'),
+('MN000003','First3','Last3','Area3','0');
 
 insert into station values
-('ST000001','LC000001','MN000001','Station1','5'),
-('ST000002','LC000002','MN000001','Station2','15'),
-('ST000003','LC000003','MN000002','Station3','30'),
-('ST000004','LC000004','MN000003','Station4','15'),
-('ST000005','LC000005','MN000003','Station5','10');
+('ST000001','LC000001','MN000001','Station1','2'),
+('ST000002','LC000002','MN000001','Station2','0'),
+('ST000003','LC000003','MN000002','Station3','1'),
+('ST000004','LC000004','MN000003','Station4','0'),
+('ST000005','LC000005','MN000003','Station5','0');
 
 insert into user values
 ('UID00001','username1','password1','email1@gmail.com','CustomerFirst1','CustomerLast1','0800000001','customer'),
@@ -62,9 +62,9 @@ insert into subscriptioninfo values
 ('SUB00003','SubC',400,30,30);
 
 insert into customersubscription values
-('SUB00001','UID00007',now(),now(),5),
-('SUB00001','UID00004',now(),now(),5),
-('SUB00002','UID00006',now(),now(),5);
+('SUB00001','UID00007',now(),now(),now(),5),
+('SUB00001','UID00004',now(),now(),now(),5),
+('SUB00002','UID00006',now(),now(),now(),5);
 
 insert into vehicle values
 ('123456789abcdefg','ABC','red'),

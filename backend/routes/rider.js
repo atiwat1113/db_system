@@ -12,11 +12,7 @@ router.get('/info', async (req, res) => {
 
     try {
         const result = await db.promise().query(`
-        select u.first_name, u.last_name, r.ref_no, r.is_available, r.rating
-        from user u 
-        natural join rider r 
-        natural join station s
-        where s.name = '${stationName}';
+        CALL GetRiderFromStation('${stationName}');
         `);
         res.status(200).send(result[0]);
     }
