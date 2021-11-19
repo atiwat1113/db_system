@@ -54,8 +54,4 @@ router.delete('/', async (req, res) => {
     }
 });
 
-router.patch('/saved-address', async (req, res) => {
-    
-});
-
 module.exports = router;
