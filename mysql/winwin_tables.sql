@@ -98,12 +98,14 @@ create table if not exists SubscriptionInfo(
 create table if not exists CustomerSubscription(
 	subscription_type char(8) not null,
     customer_ID char(8) not null,
-    start_date date not null default(now()),
+    buy_date datetime not null,
+    start_date date default(now()),
     end_date date not null,
     trips_left int unsigned not null,
     foreign key (subscription_type) references SubscriptionInfo(subscription_type) on update cascade on delete restrict,
     foreign key (customer_ID) references Customer(user_ID) on update cascade on delete cascade,
-    constraint pk_CustomerSub primary key (subscription_type, customer_ID)
+    constraint pk_CustomerSub primary key (subscription_type, customer_ID, buy_date),
+    check(end_date >= start_date)
 );
 
 create table if not exists Vehicle(

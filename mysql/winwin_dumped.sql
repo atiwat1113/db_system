@@ -78,13 +78,15 @@ DROP TABLE IF EXISTS `customersubscription`;
 CREATE TABLE `customersubscription` (
   `subscription_type` char(8) NOT NULL,
   `customer_ID` char(8) NOT NULL,
-  `start_date` date NOT NULL DEFAULT (now()),
+  `buy_date` datetime NOT NULL,
+  `start_date` date DEFAULT (now()),
   `end_date` date NOT NULL,
   `trips_left` int unsigned NOT NULL,
-  PRIMARY KEY (`subscription_type`,`customer_ID`),
+  PRIMARY KEY (`subscription_type`,`customer_ID`,`buy_date`),
   KEY `customer_ID` (`customer_ID`),
   CONSTRAINT `customersubscription_ibfk_1` FOREIGN KEY (`subscription_type`) REFERENCES `subscriptioninfo` (`subscription_type`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `customersubscription_ibfk_2` FOREIGN KEY (`customer_ID`) REFERENCES `customer` (`user_ID`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `customersubscription_ibfk_2` FOREIGN KEY (`customer_ID`) REFERENCES `customer` (`user_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `customersubscription_chk_1` CHECK ((`end_date` >= `start_date`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -94,7 +96,7 @@ CREATE TABLE `customersubscription` (
 
 LOCK TABLES `customersubscription` WRITE;
 /*!40000 ALTER TABLE `customersubscription` DISABLE KEYS */;
-INSERT INTO `customersubscription` VALUES ('SUB00001','UID00004','2021-11-18','2021-11-18',0),('SUB00001','UID00007','2021-11-17','2021-11-17',0),('SUB00002','UID00006','2021-11-18','2021-11-18',5);
+INSERT INTO `customersubscription` VALUES ('SUB00001','UID00004','2021-11-19 16:33:23','2021-11-19','2021-11-19',5),('SUB00001','UID00007','2021-11-19 16:33:23','2021-11-19','2021-11-19',5),('SUB00002','UID00006','2021-11-19 16:33:23','2021-11-19','2021-11-19',5);
 /*!40000 ALTER TABLE `customersubscription` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -144,7 +146,7 @@ CREATE TABLE `manager` (
 
 LOCK TABLES `manager` WRITE;
 /*!40000 ALTER TABLE `manager` DISABLE KEYS */;
-INSERT INTO `manager` VALUES ('MN000001','First1','Last1','Area1',10),('MN000002','First2','Last2','Area2',20),('MN000003','First3','Last3','Area3',30);
+INSERT INTO `manager` VALUES ('MN000001','First1','Last1','Area1',2),('MN000002','First2','Last2','Area2',1),('MN000003','First3','Last3','Area3',0);
 /*!40000 ALTER TABLE `manager` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -189,7 +191,7 @@ CREATE TABLE `ride` (
 
 LOCK TABLES `ride` WRITE;
 /*!40000 ALTER TABLE `ride` DISABLE KEYS */;
-INSERT INTO `ride` VALUES ('RDE00001','UID00007','UID00002','matching',45,45,45,45,1,'2021-11-18 01:44:08','2021-11-18 01:44:08',2,'comment'),('RDE00002','UID00004','UID00003','completed',45,45,45,45,1,'2021-11-18 01:44:08','2021-11-18 01:44:08',2,'comment'),('RDE00003','UID00006','UID00002','completed',45,45,45,45,1,'2021-11-18 01:44:08','2021-11-18 01:44:08',2,'comment'),('RDE00004','UID00007','UID00005','completed',45,45,45,45,1,'2021-11-18 01:44:08','2021-11-18 01:44:08',2,'comment'),('RDE00006','UID00007','UID00002','matching',50,50,80,80,45,'2021-11-18 01:44:40',NULL,NULL,NULL);
+INSERT INTO `ride` VALUES ('RDE00001','UID00007','UID00002','matching',45,45,45,45,1,'2021-11-19 16:33:23','2021-11-19 16:33:23',2,'comment'),('RDE00002','UID00004','UID00003','completed',45,45,45,45,1,'2021-11-19 16:33:23','2021-11-19 16:33:23',2,'comment'),('RDE00003','UID00006','UID00002','completed',45,45,45,45,1,'2021-11-19 16:33:23','2021-11-19 16:33:23',2,'comment'),('RDE00004','UID00007','UID00005','completed',45,45,45,45,1,'2021-11-19 16:33:23','2021-11-19 16:33:23',2,'comment');
 /*!40000 ALTER TABLE `ride` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -228,6 +230,56 @@ LOCK TABLES `rider` WRITE;
 INSERT INTO `rider` VALUES ('UID00002','ST000001','ab11111111111111','1234567891011',1,NULL,0),('UID00003','ST000001','ab11111111111112','1234567891012',0,1,100),('UID00005','ST000003','ab11111111111113','1234567891013',1,5,500);
 /*!40000 ALTER TABLE `rider` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `updateNumberOfRiders` AFTER UPDATE ON `rider` FOR EACH ROW BEGIN
+	IF NEW.station_ID != OLD.station_ID THEN
+    BEGIN
+		DECLARE new_station_manager char(8);
+        DECLARE old_station_manager char(8);
+        
+        select manager_ID into new_station_manager
+        from station
+        where station_ID = NEW.station_ID;
+        
+        select manager_ID into old_station_manager
+        from station
+        where station_ID = OLD.station_ID;
+    
+		update station
+        set number_of_riders = number_of_riders + 1
+        where station_ID = NEW.station_ID;
+        
+        update station
+        set number_of_riders = number_of_riders - 1
+        where station_ID = OLD.station_ID;
+        
+        IF new_station_manager != old_station_manager THEN
+        BEGIN
+			update manager
+			set number_of_riders = number_of_riders + 1
+			where manager_ID = new_station_manager;
+			
+			update manager
+			set number_of_riders = number_of_riders - 1
+			where manager_ID = old_station_manager;
+        END;
+        END IF;
+    END;
+    END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `ridervehicle`
@@ -281,35 +333,9 @@ CREATE TABLE `ridetransaction` (
 
 LOCK TABLES `ridetransaction` WRITE;
 /*!40000 ALTER TABLE `ridetransaction` DISABLE KEYS */;
-INSERT INTO `ridetransaction` VALUES ('TRN00007','RDE00001'),('TRN00008','RDE00002'),('TRN00009','RDE00003'),('TRN00010','RDE00004'),('TRN00011','RDE00006');
+INSERT INTO `ridetransaction` VALUES ('TRN00007','RDE00001'),('TRN00008','RDE00002'),('TRN00009','RDE00003'),('TRN00010','RDE00004');
 /*!40000 ALTER TABLE `ridetransaction` ENABLE KEYS */;
 UNLOCK TABLES;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `updateTransactionAmount` AFTER INSERT ON `ridetransaction` FOR EACH ROW BEGIN
-
-    DECLARE price float;
-
-    SELECT calcPrice(r.distance) INTO price
-    FROM ride r
-    WHERE r.ride_ID = NEW.ride_ID;
-
-    UPDATE transactionrecord
-    SET amount = price
-    WHERE transaction_ID = NEW.transaction_ID;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `savedaddress`
@@ -367,7 +393,7 @@ CREATE TABLE `station` (
 
 LOCK TABLES `station` WRITE;
 /*!40000 ALTER TABLE `station` DISABLE KEYS */;
-INSERT INTO `station` VALUES ('ST000001','LC000001','MN000001','Station1',5),('ST000002','LC000002','MN000001','Station2',15),('ST000003','LC000003','MN000002','Station3',30),('ST000004','LC000004','MN000003','Station4',15),('ST000005','LC000005','MN000003','Station5',10);
+INSERT INTO `station` VALUES ('ST000001','LC000001','MN000001','Station1',2),('ST000002','LC000002','MN000001','Station2',0),('ST000003','LC000003','MN000002','Station3',1),('ST000004','LC000004','MN000003','Station4',0),('ST000005','LC000005','MN000003','Station5',0);
 /*!40000 ALTER TABLE `station` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -395,7 +421,7 @@ CREATE TABLE `subscriptioninfo` (
 
 LOCK TABLES `subscriptioninfo` WRITE;
 /*!40000 ALTER TABLE `subscriptioninfo` DISABLE KEYS */;
-INSERT INTO `subscriptioninfo` VALUES ('SUB00001','SubAA',5000,30,30),('SUB00002','SubB',300,20,20),('SUB00003','SubC',400,30,30);
+INSERT INTO `subscriptioninfo` VALUES ('SUB00001','SubA',200,10,10),('SUB00002','SubB',300,20,20),('SUB00003','SubC',400,30,30);
 /*!40000 ALTER TABLE `subscriptioninfo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -478,7 +504,7 @@ CREATE TABLE `transactionrecord` (
 
 LOCK TABLES `transactionrecord` WRITE;
 /*!40000 ALTER TABLE `transactionrecord` DISABLE KEYS */;
-INSERT INTO `transactionrecord` VALUES ('TRN00001','top-up','2021-11-17 18:44:08','pending',100,'cash'),('TRN00002','top-up','2021-11-17 18:44:08','success',100,'bank_transfer'),('TRN00003','top-up','2021-11-17 18:44:08','success',100,'credit_card'),('TRN00004','subscription','2021-11-17 18:44:08','pending',100,'cash'),('TRN00005','subscription','2021-11-17 18:44:08','success',100,'bank_transfer'),('TRN00006','subscription','2021-11-17 18:44:08','pending',100,'credit_card'),('TRN00007','ride','2021-11-17 18:44:08','pending',100,'cash'),('TRN00008','ride','2021-11-17 18:44:08','pending',100,'bank_transfer'),('TRN00009','ride','2021-11-17 18:44:08','success',100,'credit_card'),('TRN00010','ride','2021-11-17 18:44:08','success',100,'credit_card'),('TRN00011','ride','2021-11-17 18:44:40','pending',528,'cash');
+INSERT INTO `transactionrecord` VALUES ('TRN00001','top-up','2021-11-19 09:33:23','pending',100,'cash'),('TRN00002','top-up','2021-11-19 09:33:23','success',100,'bank_transfer'),('TRN00003','top-up','2021-11-19 09:33:23','success',100,'credit_card'),('TRN00004','subscription','2021-11-19 09:33:23','pending',100,'cash'),('TRN00005','subscription','2021-11-19 09:33:23','success',100,'bank_transfer'),('TRN00006','subscription','2021-11-19 09:33:23','pending',100,'credit_card'),('TRN00007','ride','2021-11-19 09:33:23','pending',100,'cash'),('TRN00008','ride','2021-11-19 09:33:23','pending',100,'bank_transfer'),('TRN00009','ride','2021-11-19 09:33:23','success',100,'credit_card'),('TRN00010','ride','2021-11-19 09:33:23','success',100,'credit_card');
 /*!40000 ALTER TABLE `transactionrecord` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -543,7 +569,7 @@ UNLOCK TABLES;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `deleteAccountLog` AFTER DELETE ON `user` FOR EACH ROW INSERT INTO TriggerTime VALUES(NOW(), OLD.user_ID) */;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `deleteAccountLog` AFTER DELETE ON `user` FOR EACH ROW INSERT INTO TriggerTime VALUES (NOW() , OLD.user_ID) */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -584,4 +610,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-11-18  2:23:39
+-- Dump completed on 2021-11-19 16:34:09

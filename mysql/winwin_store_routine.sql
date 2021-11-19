@@ -1,9 +1,8 @@
 -- drop table TriggerTime;
 -- drop trigger  deleteAccountLog;
--- drop trigger  updateTransactionAmount;
 -- drop procedure addBooking;
 -- drop procedure GetRiderFromStation;
--- drop procedure UpdateSubscriptionInfo;
+-- drop procedure UpdateRiderStation;
 -- drop function CalcPrice;
 
 
@@ -68,20 +67,44 @@ CREATE
     INSERT INTO TriggerTime VALUES (NOW() , OLD.user_ID);
 
 DELIMITER //
-CREATE TRIGGER updateTransactionAmount
-AfTER INSERT
-ON ridetransaction FOR EACH ROW
+CREATE TRIGGER updateNumberOfRiders
+AfTER update
+ON rider for each row
 BEGIN
-
-    DECLARE price float;
-
-    SELECT calcPrice(r.distance) INTO price
-    FROM ride r
-    WHERE r.ride_ID = NEW.ride_ID;
-
-    UPDATE transactionrecord
-    SET amount = price
-    WHERE transaction_ID = NEW.transaction_ID;
+	IF NEW.station_ID != OLD.station_ID THEN
+    BEGIN
+		DECLARE new_station_manager char(8);
+        DECLARE old_station_manager char(8);
+        
+        select manager_ID into new_station_manager
+        from station
+        where station_ID = NEW.station_ID;
+        
+        select manager_ID into old_station_manager
+        from station
+        where station_ID = OLD.station_ID;
+    
+		update station
+        set number_of_riders = number_of_riders + 1
+        where station_ID = NEW.station_ID;
+        
+        update station
+        set number_of_riders = number_of_riders - 1
+        where station_ID = OLD.station_ID;
+        
+        IF new_station_manager != old_station_manager THEN
+        BEGIN
+			update manager
+			set number_of_riders = number_of_riders + 1
+			where manager_ID = new_station_manager;
+			
+			update manager
+			set number_of_riders = number_of_riders - 1
+			where manager_ID = old_station_manager;
+        END;
+        END IF;
+    END;
+    END IF;
 END //
 DELIMITER ;
 
@@ -106,7 +129,7 @@ BEGIN
 	DECLARE EXIT HANDLER FOR SQLEXCEPTION
 	BEGIN
 		ROLLBACK;
-		SELECT 'An error has occurred, operation rollbacked and the stored procedure was terminated' as error_message;
+		Resignal;
 	END;
 
 	SET autocommit = 0;
@@ -114,8 +137,8 @@ BEGIN
 	INSERT INTO ride(ride_ID,customer_ID,rider_ID,status,start_latitude,start_longitude,stop_latitude,stop_longitude,distance,start_time) VALUES
     (ride_ID,customer_ID,rider_ID,'matching',start_latitude,start_longitude,stop_latitude,stop_longitude,distance,start_time);
     
-    INSERT INTO transactionrecord(transaction_ID,type,status,payment_method) VALUES
-    (transaction_ID,'ride','pending',payment_method);
+    INSERT INTO transactionrecord(transaction_ID,type,status,amount,payment_method) VALUES
+    (transaction_ID,'ride','pending',calcPrice(distance),payment_method);
     
     INSERT INTO ridetransaction VALUES
     (transaction_ID,ride_ID);
@@ -133,17 +156,10 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE UpdateSubscriptionInfo(
- 	IN i_subscription_type CHAR(8),
- 	IN i_name VARCHAR(30),
- 	IN i_price float,
-	IN i_trips int,
-	IN i_duration int,
-    IN i_customer_ID CHAR(8),
-	IN i_start_date DATE,
-	IN i_end_date DATE,
-	IN i_trips_left int
-)
+CREATE PROCEDURE UpdateRiderStation(
+ 	IN i_user_ID CHAR(8),
+ 	IN i_station_ID CHAR(8)
+ )
 BEGIN
 	DECLARE exit handler for sqlexception
 	Begin
@@ -153,18 +169,17 @@ BEGIN
 
 	start transaction;
 
-	update SubscriptionInfo 
-    set name=i_name, price=i_price,trips=i_trips,duration = i_duration 
-    where subscription_type=i_subscription_type;
-
-	update CustomerSubscription 
-    set start_date=i_start_date,end_date=i_end_date,trips_left = i_trips_left 
-    where subscription_type=i_subscription_type and customer_ID = i_customer_ID;
+	update Rider 
+    set station_ID=i_station_ID 
+    where user_ID = i_user_ID;
 
 	commit;
 END$$
 DELIMITER ;
 
+
 -- CALL addBooking('RDE00006','UID00007','UID00002',50,50,80,80,45,now(),'TRN00011','cash');
 -- call GetRiderFromStation('Station1');
 -- CALL UpdateSubscriptionInfo('SUB00001','SubAA',5000,30,30,'UID00007',DATE('2021-11-17'),DATE('2021-11-17'),0);
+-- select DATE(DATE(now()) + 2) as date;
+-- CALL UpdateRiderStation('UID00002','ST000001');
