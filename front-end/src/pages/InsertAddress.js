@@ -33,7 +33,6 @@ const theme = createTheme({
 
 //TODO: Implement HTTP Method
 const insertNewAddress = (e) => {
-
   e.preventDefault();
 };
 
@@ -59,10 +58,8 @@ function InsertAddress() {
               padding: 32,
             }}
           >
-            <Typography variant="h5">
-              INSERT NEW ADDRESS (NOSQL)
-            </Typography>
-            
+            <Typography variant="h5">INSERT NEW ADDRESS (NOSQL)</Typography>
+
             <Divider
               style={{ background: "black", marginTop: 16 }}
               variant="fullWidth"

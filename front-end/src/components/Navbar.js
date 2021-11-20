@@ -1,6 +1,5 @@
 // Import things.
 import {
-  makeStyles,
   Box,
   AppBar,
   Toolbar,
@@ -10,9 +9,6 @@ import { Link } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/App.css";
 
-const useStyles = makeStyles((theme) => ({
-  // Handle all TextField style.
-}));
 
 function NavLink({ link_to, label, underline = "hover", margin = 15 }) {
   return (
@@ -34,8 +30,6 @@ function NavLink({ link_to, label, underline = "hover", margin = 15 }) {
 }
 
 function Navbar() {
-  const classes = useStyles();
-
   return (
     //TODO: Group Components together + Create Style class.
     // Column box arrangement. Each row contains a "row" box with a form (paper) inside.

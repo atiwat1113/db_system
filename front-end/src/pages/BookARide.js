@@ -9,7 +9,6 @@ import {
   Typography,
   createTheme,
   ThemeProvider,
-  Select,
   MenuItem,
   Collapse,
   IconButton,
@@ -56,10 +55,6 @@ function BookARide() {
   const [querySuccess, setQuerySuccess] = useState(false);
 
   //Test Function
-  const console_check = () => {
-    console.log("Pass");
-  };
-
 
   //TODO: INSERT credit card.
   async function bookRide(e) {

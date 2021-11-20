@@ -65,7 +65,6 @@ function UpdateStation() {
         if (return_status === 200) {
           setQuerySuccess(true);
         }
-        
       } catch (err) {
         console.log(err);
       }
