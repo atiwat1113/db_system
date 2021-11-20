@@ -3,6 +3,7 @@
 -- drop procedure addBooking;
 -- drop procedure GetRiderFromStation;
 -- drop procedure UpdateRiderStation;
+-- drop procedure deleteAccount;
 -- drop function CalcPrice;
 
 
@@ -143,6 +144,7 @@ BEGIN
     INSERT INTO ridetransaction VALUES
     (transaction_ID,ride_ID);
     COMMIT;
+    SET autocommit = 1;
 END//
 DELIMITER ;
 
@@ -166,7 +168,8 @@ BEGIN
 		Rollback;
 		Resignal;
 	End;
-
+    
+	SET autocommit = 0;
 	start transaction;
 
 	update Rider 
@@ -174,9 +177,31 @@ BEGIN
     where user_ID = i_user_ID;
 
 	commit;
+    SET autocommit = 1;
 END$$
 DELIMITER ;
 
+DELIMITER $$
+CREATE PROCEDURE deleteAccount(
+	IN i_user_ID char(8)
+)
+BEGIN
+	DECLARE exit handler for sqlexception
+	Begin
+		Rollback;
+		Resignal;
+	End;
+    
+    SET autocommit = 0;
+	start transaction;
+    
+    delete from user
+    where user_ID = i_user_ID;
+    
+    commit;
+    SET autocommit = 1;
+END$$
+DELIMITER ;
 
 -- CALL addBooking('RDE00006','UID00007','UID00002',50,50,80,80,45,now(),'TRN00011','cash');
 -- call GetRiderFromStation('Station1');
