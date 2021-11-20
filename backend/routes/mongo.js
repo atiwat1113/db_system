@@ -13,14 +13,10 @@ router.post('/', async (req, res) => {
     
     const location = await Location.findOne({ latitude: latitude, longitude: longitude }).exec();
     console.log('location:',location)
-    const newAddr = { 
-        name: name, 
-        location_id: location? location._id:null 
-    };
+    
 
     if(location){ // location already exists
         //* CASE 1: the user already added this location -> update user's saved_address name
-        
         if(location.saved_by.some(e => e.user_id === user_id)){
             console.log('case 1')
             Customer.find({ user_id: user_id })
@@ -41,6 +37,7 @@ router.post('/', async (req, res) => {
         else{
             console.log('case 2');
             try{
+                const newAddr = { name: name, location_id: location_id };
                 await Location.updateOne({ latitude: latitude, longitude: longitude }, { $push: { saved_by: {user_id: user_id} } });
                 await Customer.updateOne({ user_id: user_id }, { $push: { saved_address: newAddr } });
                 res.status(200).end();
@@ -64,7 +61,8 @@ router.post('/', async (req, res) => {
             saved_by: [{ user_id: user_id }]
         });
         try{
-            await newLocation.save();
+            const result = await newLocation.save();
+            const newAddr = { name: name, location_id: result._id };
             await Customer.updateOne({ user_id: user_id }, { $push: { saved_address: newAddr } });
             res.status(200).end();
         }
