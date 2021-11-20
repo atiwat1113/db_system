@@ -141,7 +141,7 @@ function DeleteAccount() {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Are you sure to delete you account?"}
+          {"Are you sure that you want to delete your account?"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
