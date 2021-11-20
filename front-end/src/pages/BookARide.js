@@ -54,31 +54,16 @@ function BookARide() {
   const [dateTime, setDateTime] = useState(new Date());
   const [payment_method, setPayment_Method] = useState("cash");
   const [querySuccess, setQuerySuccess] = useState(false);
-  const [queryFail, setQueryFail] = useState(false);
-  const [isResolved, setResolved] = useState(false);
-
-  // Axios cancel query
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
 
   //Test Function
   const console_check = () => {
     console.log("Pass");
   };
 
-  //TODO: Cancel request after timeout.
-  setTimeout(() => {
-    if (!isResolved) {
-      source.cancel("Operation canceled by the user.");
-      setResolved(false);
-    }
-  }, 2000);
 
   //TODO: INSERT credit card.
   async function bookRide(e) {
     e.preventDefault();
-
-    setResolved(false);
 
     if (
       startLatitude &&
@@ -102,7 +87,6 @@ function BookARide() {
       try {
         const return_status = await axios
           .post("/customers/ride-transaction", input_body, {
-            cancelToken: source.token,
             headers: {
               // Overwrite Axios's automatically set Content-Type
               "Content-Type": "application/json",
@@ -113,12 +97,10 @@ function BookARide() {
         console.log(return_status);
 
         if (return_status === 200) {
-          setResolved(true);
           setQuerySuccess(true);
         }
       } catch (err) {
         console.log(err);
-        setQueryFail(true);
       }
     }
   }
@@ -230,26 +212,6 @@ function BookARide() {
                   }
                 >
                   Success!
-                </Alert>
-              </Collapse>
-
-              <Collapse in={queryFail}>
-                <Alert
-                  severity="error"
-                  action={
-                    <IconButton
-                      aria-label="close"
-                      size="small"
-                      onClick={() => {
-                        setQueryFail(false);
-                      }}
-                    >
-                      <CloseIcon fontSize="inherit" />
-                    </IconButton>
-                  }
-                  sx={{ mt: 1 }}
-                >
-                  Failed, please check your query!
                 </Alert>
               </Collapse>
 
