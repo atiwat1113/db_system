@@ -1,6 +1,7 @@
 const express = require('express');
 const Location = require('../mongo/Location');
 const Customer = require('../mongo/Customer');
+const customer = require('./customer');
 
 const router = express.Router();
 
@@ -19,17 +20,18 @@ router.post('/', async (req, res) => {
         //* CASE 1: the user already added this location -> update user's saved_address name
         if(location.saved_by.some(e => e.user_id === user_id)){
             console.log('case 1')
-            Customer.find({ user_id: user_id })
-            .then(user => {
-                    user.forEach(addr => {
-                        if(addr.location_id == location._id){
-                            addr.name = name;
-                        }
-                    })
+            Customer.findOne({ user_id: user_id })
+            .then(async customer => {
+                customer.saved_address.forEach(addr => {
+                    if(addr.location_id == location._id){
+                        addr.name = name;
+                    }
+               })
+               await customer.save();
             })
             .catch(err => {
-                    console.log('case 1 error:', err);
-                    res.status(500).end();
+                console.log('case 1 error:', err);
+                res.status(500).end();
             })
             res.status(200).end()
         }
