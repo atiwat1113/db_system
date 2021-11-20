@@ -1,20 +1,20 @@
-drop table ridetransaction;
-drop table subscriptiontransaction;
-drop table topuptransaction;
-drop table cardinfo;
-drop table savedaddress;
-drop table transactionrecord;
-drop table ride;
-drop table ridervehicle;
-drop table vehicle;
-drop table customersubscription;
-drop table rider;
-drop table customer;
-drop table user;
-drop table station;
-drop table location;
-drop table manager;
-drop table subscriptioninfo;
+-- drop table ridetransaction;
+-- drop table subscriptiontransaction;
+-- drop table topuptransaction;
+-- drop table cardinfo;
+-- drop table savedaddress;
+-- drop table transactionrecord;
+-- drop table ride;
+-- drop table ridervehicle;
+-- drop table vehicle;
+-- drop table customersubscription;
+-- drop table rider;
+-- drop table customer;
+-- drop table user;
+-- drop table station;
+-- drop table location;
+-- drop table manager;
+-- drop table subscriptioninfo;
 
 create table if not exists User(
 	user_ID char(8) primary key,

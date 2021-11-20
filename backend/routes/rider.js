@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../database');
+
+let db;
 
 router.get('/', (req, res) => {
     res.send('rider database');
@@ -38,4 +39,7 @@ router.patch('/station', async (req, res) => {
 
 })
 
-module.exports = router;
+module.exports = module.exports = function (mysqlConnection) {
+    db = mysqlConnection;
+    return router;
+};
