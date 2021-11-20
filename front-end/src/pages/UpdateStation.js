@@ -1,21 +1,24 @@
 // Import things.
 import {
-  TextField,
-  makeStyles,
-  Button,
-  Paper,
-  Divider,
   Box,
-  Typography,
+  Button,
   createTheme,
+  Divider,
+  makeStyles,
+  Paper,
+  TextField,
   ThemeProvider,
+  Typography,
+  Collapse,
+  IconButton,
 } from "@material-ui/core";
 import { Alert } from "@mui/material";
-import { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "../styles/App.css";
-import Navbar from "../components/Navbar";
 import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { useState } from "react";
+import Navbar from "../components/Navbar";
+import "../styles/App.css";
+import CloseIcon from "@mui/icons-material/Close";
 
 const useStyles = makeStyles((theme) => ({
   // Handle all TextField style.
@@ -38,6 +41,7 @@ function UpdateStation() {
 
   // useState with variables.
   const [stationID, setStationID] = useState("");
+  const [querySuccess, setQuerySuccess] = useState(false);
 
   //TODO: Implement HTTP Method
   async function updateStationID(e) {
@@ -57,6 +61,11 @@ function UpdateStation() {
           })
           .then((res) => res.status);
         console.log(return_status);
+
+        if (return_status === 200) {
+          setQuerySuccess(true);
+        }
+        
       } catch (err) {
         console.log(err);
       }
@@ -90,6 +99,24 @@ function UpdateStation() {
                 required
                 fullWidth
               />
+
+              <Collapse in={querySuccess}>
+                <Alert
+                  action={
+                    <IconButton
+                      aria-label="close"
+                      size="small"
+                      onClick={() => {
+                        setQuerySuccess(false);
+                      }}
+                    >
+                      <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                  }
+                >
+                  Success!
+                </Alert>
+              </Collapse>
 
               <Button
                 type="submit"
