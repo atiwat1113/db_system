@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const Location = new Schema({
+const locationSchema = new Schema({
     latitude: {
         type: Number,
         required: true,
@@ -38,14 +38,12 @@ const Location = new Schema({
         minlength: 5,
         maxlength: 5,
         match: /[1-9][0-9]*/
-    }
+    },
+    saved_by: [{ //stores customer who saved the location
+        user_id: String
+    }],
 }, {timestamps: true}) 
 
-/**
- * Latitude
- * Longitude
- * Sub-district
- * district
- * province
- * postal_code
- */
+locationSchema.index({ latitude: 1, longitude: 1}, { unique: true }); // make (latitude, longitude) unique
+
+module.exports = mongoose.model('Location', locationSchema, 'Location')
