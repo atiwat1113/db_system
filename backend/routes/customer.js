@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../database');
 const makeID = require('../function');
+
+let db;
 
 router.get('/', (req, res) => {
     res.send('customer database');
@@ -53,4 +54,7 @@ router.delete('/', async (req, res) => {
     }
 });
 
-module.exports = router;
+module.exports = function (mysqlConnection) {
+    db = mysqlConnection;
+    return router;
+};

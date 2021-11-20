@@ -1,6 +1,7 @@
 const express = require('express');
-const RiderRouter = require('./routes/rider');
-const CustomerRouter = require('./routes/customer');
+const db = require('./database');
+const RiderRouter = require('./routes/rider')(db);
+const CustomerRouter = require('./routes/customer')(db);
 const cors = require('cors');
 require('dotenv').config()
 const mongoose = require('mongoose');
