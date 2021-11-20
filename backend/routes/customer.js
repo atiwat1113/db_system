@@ -44,8 +44,7 @@ router.delete('/', async (req, res) => {
 
     try {
         await db.promise().execute(`
-        delete from user
-        where user_ID = '${user_ID}'
+        CALL deleteAccount('${user_ID}');
         `);
         res.status(200).end();
     }
