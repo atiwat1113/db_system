@@ -702,7 +702,7 @@ BEGIN
 		Resignal;
 	END;
 
-	SET autocommit = 0;
+	SET autocommit = 1;
 	START TRANSACTION;
 	INSERT INTO ride(ride_ID,customer_ID,rider_ID,status,start_latitude,start_longitude,stop_latitude,stop_longitude,distance,start_time) VALUES
     (ride_ID,customer_ID,rider_ID,'matching',start_latitude,start_longitude,stop_latitude,stop_longitude,distance,start_time);
