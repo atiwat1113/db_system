@@ -8,6 +8,13 @@ import {
   Typography,
   createTheme,
   ThemeProvider,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Collapse,
+  IconButton,
 } from "@material-ui/core";
 import { Alert } from "@mui/material";
 import { useState } from "react";
@@ -15,6 +22,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/App.css";
 import Navbar from "../components/Navbar";
 import axios from "axios";
+import CloseIcon from "@mui/icons-material/Close";
 
 const useStyles = makeStyles((theme) => ({
   // Handle all TextField style.
@@ -32,25 +40,41 @@ const theme = createTheme({
   },
 });
 
-//TODO: Implement HTTP Method
-async function deleteAccount(e) {
-  e.preventDefault();
-
-  try {
-    const return_status = await axios
-      .delete("/customers")
-      .then((res) => res.status);
-    console.log(return_status);
-  } catch (err) {
-    console.log(err);
-  }
-}
-
 function DeleteAccount() {
   const classes = useStyles();
 
   // useState.
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
+  const [querySuccess, setQuerySuccess] = useState(false);
+
+  //TODO: Handle Close Modal function.
+  const handleOpen = (e) => {
+    e.preventDefault();
+    setDeleteConfirmation(true);
+  };
+  const handleClose = (e) => {
+    e.preventDefault();
+    setDeleteConfirmation(false);
+  };
+
+  //TODO: Implement HTTP Method
+  async function deleteAccount(e) {
+    e.preventDefault();
+    setDeleteConfirmation(false);
+
+    try {
+      const return_status = await axios
+        .delete("/customers")
+        .then((res) => res.status);
+      console.log(return_status);
+
+      if (return_status === 200) {
+        setQuerySuccess(true);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -71,25 +95,69 @@ function DeleteAccount() {
               style={{ background: "black", marginTop: 16 }}
               variant="fullWidth"
             />
-            <form noValidate autoComplete="off" onSubmit={deleteAccount}>
+            <form noValidate autoComplete="off" onSubmit={handleOpen}>
+              <Collapse
+                style={{
+                  marginTop: 16,
+                  marginBottom: 16,
+                }}
+                in={querySuccess}
+              >
+                <Alert
+                  action={
+                    <IconButton
+                      aria-label="close"
+                      size="small"
+                      onClick={() => {
+                        setQuerySuccess(false);
+                      }}
+                    >
+                      <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                  }
+                >
+                  Success!
+                </Alert>
+              </Collapse>
+
               <Button
                 type="submit"
                 variant="outlined"
                 color="secondary"
                 fullWidth
-                style={{ marginTop: 16 }}
               >
                 Delete
               </Button>
             </form>
           </Paper>
-          {deleteConfirmation ? (
-            <Alert severity="warning" style={{ marginTop: 16 }}>
-              TODO: Implement Alert Dailog
-            </Alert>
-          ) : null}
         </Box>
       </Box>
+
+      <Dialog
+        disableBackdropClick
+        open={deleteConfirmation}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Are you sure to delete you account?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            By agreeing to delete your account, your account will be deleted and
+            can't be retrieved.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button color="secondary" onClick={handleClose}>
+            Disagree
+          </Button>
+          <Button onClick={deleteAccount} autoFocus>
+            Agree
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ThemeProvider>
   );
 }

@@ -45,18 +45,6 @@ function QueryRiders() {
   const [stationName, setStationName] = useState("");
   const [returnData, setReturnData] = useState([]);
 
-  function createData(name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein };
-  }
-
-  const rows = [
-    createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-    createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-    createData("Eclair", 262, 16.0, 24, 6.0),
-    createData("Cupcake", 305, 3.7, 67, 4.3),
-    createData("Gingerbread", 356, 16.0, 49, 3.9),
-  ];
-
   //TODO: Implement HTTP Method
   async function queryRiders(e) {
     e.preventDefault();
@@ -74,27 +62,24 @@ function QueryRiders() {
         //TODO: Alter some return data.
         return_data.map((row) => {
           for (const [key, value] of Object.entries(row)) {
-            if (key === "is_available"){
-              if (value === 1){
-                row[key] = 'Available';
+            if (key === "is_available") {
+              if (value === 1) {
+                row[key] = "Available";
               } else {
-                row[key] = 'Unavailable'
+                row[key] = "Unavailable";
               }
             }
 
-            if (key === "rating"){
-              if (!value){
-                row[key] = 'TBD'
+            if (key === "rating") {
+              if (!value) {
+                row[key] = "TBD";
               }
             }
           }
-        })
+        });
 
         //TODO: Set ReturnData to Table
         setReturnData(return_data);
-
-        
-
       } catch (err) {
         console.log(err);
       }
