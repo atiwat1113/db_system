@@ -11,6 +11,8 @@ import {
   ThemeProvider,
   Select,
   MenuItem,
+  Collapse,
+  IconButton,
 } from "@material-ui/core";
 import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -20,7 +22,9 @@ import axios from "axios";
 import DateAdapter from "@mui/lab/AdapterMoment";
 import DateTimePicker from "@mui/lab/DateTimePicker";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import moment from 'moment';
+import moment from "moment";
+import { Alert } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 const useStyles = makeStyles((theme) => ({
   // Handle all TextField style.
@@ -49,43 +53,74 @@ function BookARide() {
   const [distance, setDistance] = useState(0.0);
   const [dateTime, setDateTime] = useState(new Date());
   const [payment_method, setPayment_Method] = useState("cash");
+  const [querySuccess, setQuerySuccess] = useState(false);
+  const [queryFail, setQueryFail] = useState(false);
+  const [isResolved, setResolved] = useState(false);
+
+  // Axios cancel query
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
 
   //Test Function
   const console_check = () => {
     console.log("Pass");
   };
 
+  //TODO: Cancel request after timeout.
+  setTimeout(() => {
+    if (!isResolved) {
+      source.cancel("Operation canceled by the user.");
+      setResolved(false);
+    }
+  }, 2000);
+
   //TODO: INSERT credit card.
   async function bookRide(e) {
     e.preventDefault();
 
-    if(startLatitude && startLongitude && stopLatitude && stopLongitude && distance && dateTime && payment_method){
+    setResolved(false);
+
+    if (
+      startLatitude &&
+      startLongitude &&
+      stopLatitude &&
+      stopLongitude &&
+      distance &&
+      dateTime &&
+      payment_method
+    ) {
       const input_body = JSON.stringify({
         start_latitude: parseFloat(startLatitude),
         start_longitude: parseFloat(startLongitude),
         stop_latitude: parseFloat(stopLatitude),
         stop_longitude: parseFloat(stopLongitude),
         distance: parseFloat(distance),
-        start_time: moment(dateTime).format('YYYY-MM-DD HH:mm:ss'),
+        start_time: moment(dateTime).format("YYYY-MM-DD HH:mm:ss"),
         payment_method: payment_method,
       });
-      
+
       try {
         const return_status = await axios
           .post("/customers/ride-transaction", input_body, {
+            cancelToken: source.token,
             headers: {
               // Overwrite Axios's automatically set Content-Type
               "Content-Type": "application/json",
             },
           })
           .then((res) => res.status);
+
         console.log(return_status);
+
+        if (return_status === 200) {
+          setResolved(true);
+          setQuerySuccess(true);
+        }
       } catch (err) {
         console.log(err);
+        setQueryFail(true);
       }
-
     }
-
   }
 
   return (
@@ -179,6 +214,44 @@ function BookARide() {
                   Credit Card
                 </MenuItem>
               </TextField>
+
+              <Collapse in={querySuccess}>
+                <Alert
+                  action={
+                    <IconButton
+                      aria-label="close"
+                      size="small"
+                      onClick={() => {
+                        setQuerySuccess(false);
+                      }}
+                    >
+                      <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                  }
+                >
+                  Success!
+                </Alert>
+              </Collapse>
+
+              <Collapse in={queryFail}>
+                <Alert
+                  severity="error"
+                  action={
+                    <IconButton
+                      aria-label="close"
+                      size="small"
+                      onClick={() => {
+                        setQueryFail(false);
+                      }}
+                    >
+                      <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                  }
+                  sx={{ mt: 1 }}
+                >
+                  Failed, please check your query!
+                </Alert>
+              </Collapse>
 
               <Button
                 type="submit"
