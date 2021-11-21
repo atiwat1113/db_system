@@ -123,9 +123,9 @@ create table if not exists RiderVehicle(
 );
 
 create table if not exists Ride(
-	ride_ID char(8) primary key,
+	ride_ID char(8) not null,
     customer_ID char(8),
-    rider_ID char(8),
+    rider_ID char(8) not null,
     status enum('matching','matched','cancelled','in_transit','arrived','paid','reviewing','completed') not null,
     start_latitude float not null,
     start_longitude float not null,
@@ -134,16 +134,21 @@ create table if not exists Ride(
     distance float not null,
     start_time datetime not null default(now()),
     stop_time datetime,
-    review_rating smallint,
+    review_rating smallint not null default 0,
     review_comment text,
-    foreign key (rider_ID) references Rider(user_ID) on update cascade on delete set null,
+    foreign key (rider_ID) references Rider(user_ID) on update cascade on delete restrict,
     foreign key (customer_ID) references Customer(user_ID) on update cascade on delete set null,
     check(distance >= 0),
-    check(review_rating >= 1 and review_rating <= 5),
+    check((review_rating >= 1 and review_rating <= 5) or review_rating = 0),
     check(start_latitude >= -90 and start_latitude <= 90),
     check(start_longitude >= -180 and start_longitude <= 180),
     check(stop_latitude >= -90 and stop_latitude <= 90),
-    check(stop_longitude >= -180 and stop_longitude <= 180)
+    check(stop_longitude >= -180 and stop_longitude <= 180),
+    -- CONSTRAINT pk PRIMARY KEY (rider_ID,ride_ID,review_rating),
+    constraint unique rating_index (rider_ID,ride_ID,review_rating),
+    constraint unique ride_ID (ride_ID)
+    -- index ride_ID (ride_ID)
+    -- index rating_index type btree (rider_ID,ride_ID,review_rating) 
 );
 
 create table if not exists TransactionRecord(
