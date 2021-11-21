@@ -8,6 +8,8 @@ DB_PASS=your password
 
 DB_NAME=your database name
 
+MONGODB=mongodb://localhost/dbname
+
 เปิด cmd/terminal -> พิมพ์ npm i
 
 รันโดยพิมพ์ npm start

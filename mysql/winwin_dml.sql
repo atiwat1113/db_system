@@ -77,9 +77,9 @@ insert into ridervehicle values
 ('VEH00003','UID00005','123456780abcdefg');
 
 insert into ride values
-('RDE00001','UID00007','UID00002','matching',45,45,45,45,1,now(),now(),2,'comment'),
+('RDE00001','UID00007','UID00002','matching',45,45,45,45,1,now(),now(),0,'comment'),
 ('RDE00002','UID00004','UID00003','completed',45,45,45,45,1,now(),now(),2,'comment'),
-('RDE00003','UID00006','UID00002','completed',45,45,45,45,1,now(),now(),2,'comment'),
+('RDE00003','UID00006','UID00002','completed',45,45,45,45,1,now(),now(),0,'comment'),
 ('RDE00004','UID00007','UID00005','completed',45,45,45,45,1,now(),now(),2,'comment');
 
 insert into transactionrecord values

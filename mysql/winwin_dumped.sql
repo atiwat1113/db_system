@@ -96,7 +96,7 @@ CREATE TABLE `customersubscription` (
 
 LOCK TABLES `customersubscription` WRITE;
 /*!40000 ALTER TABLE `customersubscription` DISABLE KEYS */;
-INSERT INTO `customersubscription` VALUES ('SUB00001','UID00004','2021-11-20 21:43:19','2021-11-20','2021-11-20',5),('SUB00001','UID00007','2021-11-20 21:43:19','2021-11-20','2021-11-20',5),('SUB00002','UID00006','2021-11-20 21:43:19','2021-11-20','2021-11-20',5);
+INSERT INTO `customersubscription` VALUES ('SUB00001','UID00004','2021-11-21 23:37:06','2021-11-21','2021-11-21',5),('SUB00001','UID00007','2021-11-21 23:37:06','2021-11-21','2021-11-21',5),('SUB00002','UID00006','2021-11-21 23:37:06','2021-11-21','2021-11-21',5);
 /*!40000 ALTER TABLE `customersubscription` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -160,7 +160,7 @@ DROP TABLE IF EXISTS `ride`;
 CREATE TABLE `ride` (
   `ride_ID` char(8) NOT NULL,
   `customer_ID` char(8) DEFAULT NULL,
-  `rider_ID` char(8) DEFAULT NULL,
+  `rider_ID` char(8) NOT NULL,
   `status` enum('matching','matched','cancelled','in_transit','arrived','paid','reviewing','completed') NOT NULL,
   `start_latitude` float NOT NULL,
   `start_longitude` float NOT NULL,
@@ -169,15 +169,15 @@ CREATE TABLE `ride` (
   `distance` float NOT NULL,
   `start_time` datetime NOT NULL DEFAULT (now()),
   `stop_time` datetime DEFAULT NULL,
-  `review_rating` smallint DEFAULT NULL,
+  `review_rating` smallint NOT NULL DEFAULT '0',
   `review_comment` text,
-  PRIMARY KEY (`ride_ID`),
-  KEY `rider_ID` (`rider_ID`),
+  UNIQUE KEY `rating_index` (`rider_ID`,`ride_ID`,`review_rating`),
+  UNIQUE KEY `ride_ID` (`ride_ID`),
   KEY `customer_ID` (`customer_ID`),
-  CONSTRAINT `ride_ibfk_1` FOREIGN KEY (`rider_ID`) REFERENCES `rider` (`user_ID`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `ride_ibfk_1` FOREIGN KEY (`rider_ID`) REFERENCES `rider` (`user_ID`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `ride_ibfk_2` FOREIGN KEY (`customer_ID`) REFERENCES `customer` (`user_ID`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `ride_chk_1` CHECK ((`distance` >= 0)),
-  CONSTRAINT `ride_chk_2` CHECK (((`review_rating` >= 1) and (`review_rating` <= 5))),
+  CONSTRAINT `ride_chk_2` CHECK ((((`review_rating` >= 1) and (`review_rating` <= 5)) or (`review_rating` = 0))),
   CONSTRAINT `ride_chk_3` CHECK (((`start_latitude` >= -(90)) and (`start_latitude` <= 90))),
   CONSTRAINT `ride_chk_4` CHECK (((`start_longitude` >= -(180)) and (`start_longitude` <= 180))),
   CONSTRAINT `ride_chk_5` CHECK (((`stop_latitude` >= -(90)) and (`stop_latitude` <= 90))),
@@ -191,7 +191,7 @@ CREATE TABLE `ride` (
 
 LOCK TABLES `ride` WRITE;
 /*!40000 ALTER TABLE `ride` DISABLE KEYS */;
-INSERT INTO `ride` VALUES ('aNee4e1L','UID00007','UID00002','matching',50,50,50,50,10,'2021-11-19 09:34:21',NULL,NULL,NULL),('RDE00001','UID00007','UID00002','matching',45,45,45,45,1,'2021-11-20 21:43:19','2021-11-20 21:43:19',2,'comment'),('RDE00002','UID00004','UID00003','completed',45,45,45,45,1,'2021-11-20 21:43:19','2021-11-20 21:43:19',2,'comment'),('RDE00003','UID00006','UID00002','completed',45,45,45,45,1,'2021-11-20 21:43:19','2021-11-20 21:43:19',2,'comment'),('RDE00004','UID00007','UID00005','completed',45,45,45,45,1,'2021-11-20 21:43:19','2021-11-20 21:43:19',2,'comment');
+INSERT INTO `ride` VALUES ('RDE00001','UID00007','UID00002','matching',45,45,45,45,1,'2021-11-21 23:37:06','2021-11-21 23:37:06',0,'comment'),('RDE00003','UID00006','UID00002','completed',45,45,45,45,1,'2021-11-21 23:37:06','2021-11-21 23:37:06',0,'comment'),('RDE00002','UID00004','UID00003','completed',45,45,45,45,1,'2021-11-21 23:37:06','2021-11-21 23:37:06',2,'comment'),('RDE00004','UID00007','UID00005','completed',45,45,45,45,1,'2021-11-21 23:37:06','2021-11-21 23:37:06',2,'comment');
 /*!40000 ALTER TABLE `ride` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -333,7 +333,7 @@ CREATE TABLE `ridetransaction` (
 
 LOCK TABLES `ridetransaction` WRITE;
 /*!40000 ALTER TABLE `ridetransaction` DISABLE KEYS */;
-INSERT INTO `ridetransaction` VALUES ('rc4oYfKr','aNee4e1L'),('TRN00007','RDE00001'),('TRN00008','RDE00002'),('TRN00009','RDE00003'),('TRN00010','RDE00004');
+INSERT INTO `ridetransaction` VALUES ('TRN00007','RDE00001'),('TRN00008','RDE00002'),('TRN00009','RDE00003'),('TRN00010','RDE00004');
 /*!40000 ALTER TABLE `ridetransaction` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -516,7 +516,7 @@ CREATE TABLE `transactionrecord` (
 
 LOCK TABLES `transactionrecord` WRITE;
 /*!40000 ALTER TABLE `transactionrecord` DISABLE KEYS */;
-INSERT INTO `transactionrecord` VALUES ('rc4oYfKr','ride','2021-11-20 14:43:35','pending',108,'cash'),('TRN00001','top-up','2021-11-20 14:43:19','pending',100,'cash'),('TRN00002','top-up','2021-11-20 14:43:19','success',100,'bank_transfer'),('TRN00003','top-up','2021-11-20 14:43:19','success',100,'credit_card'),('TRN00004','subscription','2021-11-20 14:43:19','pending',100,'cash'),('TRN00005','subscription','2021-11-20 14:43:19','success',100,'bank_transfer'),('TRN00006','subscription','2021-11-20 14:43:19','pending',100,'credit_card'),('TRN00007','ride','2021-11-20 14:43:19','pending',100,'cash'),('TRN00008','ride','2021-11-20 14:43:19','pending',100,'bank_transfer'),('TRN00009','ride','2021-11-20 14:43:19','success',100,'credit_card'),('TRN00010','ride','2021-11-20 14:43:19','success',100,'credit_card');
+INSERT INTO `transactionrecord` VALUES ('TRN00001','top-up','2021-11-21 16:37:06','pending',100,'cash'),('TRN00002','top-up','2021-11-21 16:37:06','success',100,'bank_transfer'),('TRN00003','top-up','2021-11-21 16:37:06','success',100,'credit_card'),('TRN00004','subscription','2021-11-21 16:37:06','pending',100,'cash'),('TRN00005','subscription','2021-11-21 16:37:06','success',100,'bank_transfer'),('TRN00006','subscription','2021-11-21 16:37:06','pending',100,'credit_card'),('TRN00007','ride','2021-11-21 16:37:06','pending',100,'cash'),('TRN00008','ride','2021-11-21 16:37:06','pending',100,'bank_transfer'),('TRN00009','ride','2021-11-21 16:37:06','success',100,'credit_card'),('TRN00010','ride','2021-11-21 16:37:06','success',100,'credit_card');
 /*!40000 ALTER TABLE `transactionrecord` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -716,7 +716,7 @@ BEGIN
 		Resignal;
 	END;
 
-	SET autocommit = 1;
+	SET autocommit = 0;
 	START TRANSACTION;
 	INSERT INTO ride(ride_ID,customer_ID,rider_ID,status,start_latitude,start_longitude,stop_latitude,stop_longitude,distance,start_time) VALUES
     (ride_ID,customer_ID,rider_ID,'matching',start_latitude,start_longitude,stop_latitude,stop_longitude,distance,start_time);
@@ -853,4 +853,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-11-20 21:45:48
+-- Dump completed on 2021-11-21 23:42:08
