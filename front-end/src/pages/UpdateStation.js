@@ -37,6 +37,8 @@ const theme = createTheme({
 });
 
 function UpdateStation() {
+  document.title = "UPDATE Station";
+
   const classes = useStyles();
 
   // useState with variables.

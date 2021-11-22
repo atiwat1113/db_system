@@ -37,6 +37,8 @@ const theme = createTheme({
 });
 
 function InsertAddress() {
+  document.title = "INSERT new address (NOSQL)";
+  
   const classes = useStyles();
 
   // useState with variables.
