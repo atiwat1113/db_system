@@ -39,6 +39,8 @@ const theme = createTheme({
 });
 
 function QueryRiders() {
+  document.title = "QUERY riders form station";
+
   const classes = useStyles();
 
   // useState with variables.

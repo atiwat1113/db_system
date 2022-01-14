@@ -42,6 +42,8 @@ const theme = createTheme({
 });
 
 function BookARide() {
+  document.title = "Book a Ride (INSERT)";
+
   const classes = useStyles();
 
   // useState with variables.

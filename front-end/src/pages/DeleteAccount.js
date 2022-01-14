@@ -41,6 +41,8 @@ const theme = createTheme({
 });
 
 function DeleteAccount() {
+  document.title = "DELETE Account";
+  
   const classes = useStyles();
 
   // useState.
